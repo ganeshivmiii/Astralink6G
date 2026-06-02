@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 AstraLink 6G
 ============
 
@@ -80,3 +81,6 @@ Future Scope
 - Add energy-aware optimization for green 6G communication.
 - Add edge-cloud task offloading recommendations.
 - Connect the dashboard to a real-time alerting channel.
+=======
+# Astralink6G
+>>>>>>> 4df94d0f7e68b9d91a92f1bfadd9edf9f249042f
