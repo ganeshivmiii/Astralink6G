@@ -1,1067 +1,265 @@
-import json
-import os
 import time
 
-import joblib
 import matplotlib.pyplot as plt
 import networkx as nx
+import numpy as np
 import pandas as pd
 import streamlit as st
 
 
-st.set_page_config(
-    page_title="Astralink6G",
-    page_icon="assets/favicon.svg",
-    layout="wide"
-)
+st.set_page_config(page_title="Astralink6G", page_icon="A", layout="wide")
 
 
-def apply_premium_theme():
-    st.image(
-        "assets/astralink6g_white.svg",
-        width=260
-    )
+def style():
     st.markdown(
         """
         <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-
         :root {
-            --primary-red: #E50914;
-            --primary-red-dark: #B8050D;
-            --bg-primary: #F8FAFC;
-            --bg-secondary: #FFFFFF;
-            --text-primary: #111827;
-            --text-secondary: #374151;
-            --text-tertiary: #6B7280;
-            --border-color: #E5E7EB;
-            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
-            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
-            --shadow-lg: 0 10px 24px rgba(0,0,0,0.10);
-            --shadow-xl: 0 20px 48px rgba(0,0,0,0.12);
+            --red: #e4001b;
+            --dark: #111217;
+            --muted: #69707a;
+            --line: #eceef2;
         }
-
-        html, body, [class*="css"] {
-            font-family: 'Inter', Arial, sans-serif;
-        }
-
         .stApp {
-            background: linear-gradient(180deg, #F8FAFC 0%, #FFFFFF 100%);
-            color: var(--text-primary);
+            background: linear-gradient(180deg, #fff 0%, #f7f8fb 55%, #fff 100%);
+            color: var(--dark);
         }
-
+        #MainMenu, footer, [data-testid="stDeployButton"] {
+            display: none;
+        }
         .block-container {
-            max-width: 1240px;
-            padding-top: 28px;
-            padding-bottom: 48px;
+            max-width: 1180px;
+            padding-top: 26px;
+            padding-bottom: 38px;
         }
-
-        header[data-testid="stHeader"] {
-            background: transparent;
-        }
-
-        .main-hero {
+        .hero {
             position: relative;
             overflow: hidden;
-            padding: 32px 34px;
-            border: 1px solid rgba(229, 9, 20, 0.16);
-            border-radius: 8px;
-            background:
-                linear-gradient(135deg, #E50914, #B8050D),
-                repeating-linear-gradient(120deg, rgba(255,255,255,0.12) 0 1px, transparent 1px 28px);
-            box-shadow: var(--shadow-xl);
-            margin-bottom: 22px;
+            border-radius: 10px;
+            padding: 30px;
+            background: linear-gradient(135deg, #e4001b, #aa0015);
+            box-shadow: 0 20px 48px rgba(20, 22, 28, .16);
+            margin-bottom: 18px;
         }
-
-        .main-hero::after {
+        .hero:after {
             content: "";
             position: absolute;
+            right: -88px;
             top: -110px;
-            right: -70px;
-            width: 280px;
-            height: 280px;
-            border: 34px solid rgba(255,255,255,0.16);
+            width: 260px;
+            height: 260px;
+            border: 32px solid rgba(255,255,255,.15);
             border-radius: 50%;
         }
-
-        .brand-row {
-            position: relative;
-            z-index: 1;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 18px;
-            margin-bottom: 26px;
-        }
-
-        .brand-mark {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            color: #fff;
-            font-weight: 800;
-            font-size: 15px;
-            letter-spacing: 0;
-            text-transform: uppercase;
-        }
-
-        .brand-dot {
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            background: #fff;
-            color: var(--primary-red);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
+        .brand {
+            color: white;
             font-weight: 900;
-            box-shadow: var(--shadow-lg);
+            font-size: 15px;
+            text-transform: uppercase;
+            margin-bottom: 22px;
         }
-
-        .status-pill {
-            color: #fff;
-            border: 1px solid rgba(255,255,255,0.40);
-            background: rgba(255,255,255,0.12);
-            border-radius: 999px;
-            padding: 8px 12px;
-            font-size: 13px;
-            font-weight: 700;
-        }
-
-        .hero-title {
+        .hero h1 {
             position: relative;
             z-index: 1;
+            max-width: 760px;
             margin: 0;
-            color: #fff;
+            color: white;
             font-size: 42px;
             line-height: 1.08;
-            font-weight: 800;
             letter-spacing: 0;
-            max-width: 820px;
         }
-
-        .hero-copy {
+        .hero p {
             position: relative;
             z-index: 1;
-            max-width: 720px;
-            margin: 14px 0 0;
-            color: rgba(255,255,255,0.88);
-            font-size: 16px;
+            max-width: 680px;
+            color: rgba(255,255,255,.86);
+            font-size: 15px;
             line-height: 1.55;
         }
-
-        .metric-card {
-            padding: 18px 18px 16px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            background: var(--bg-secondary);
-            box-shadow: var(--shadow-md);
-            min-height: 104px;
+        .card {
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            background: white;
+            padding: 16px;
+            box-shadow: 0 12px 28px rgba(20, 22, 28, .08);
+            min-height: 96px;
         }
-
-        .metric-label {
-            color: var(--text-secondary);
+        .label {
+            color: var(--muted);
             font-size: 12px;
-            font-weight: 700;
+            font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 9px;
         }
-
-        .metric-value {
-            color: var(--text-primary);
-            font-size: 28px;
-            font-weight: 800;
-            line-height: 1.1;
+        .value {
+            color: var(--dark);
+            font-size: 25px;
+            font-weight: 900;
+            margin-top: 8px;
+            overflow-wrap: anywhere;
         }
-
-        .metric-note {
-            margin-top: 7px;
-            color: var(--text-secondary);
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .section-title {
-            margin: 24px 0 12px;
-            color: var(--text-primary);
-            font-size: 24px;
-            line-height: 1.2;
-            font-weight: 800;
-            letter-spacing: -0.3px;
-        }
-
-        .section-copy {
-            margin: 0 0 20px;
-            color: var(--text-secondary);
-            font-size: 14px;
-            line-height: 1.6;
-        }
-
-        div[data-testid="stTabs"] button {
-            border-radius: 8px 8px 0 0;
-            color: var(--text-secondary);
-            font-weight: 700;
-            white-space: nowrap;
-        }
-
-        div[data-testid="stTabs"] button[aria-selected="true"] {
-            color: var(--primary-red);
-            border-bottom-color: var(--primary-red);
-        }
-
         div[data-testid="stTabs"] div[role="tablist"] {
-            gap: 6px;
             overflow-x: auto;
             scrollbar-width: thin;
         }
-
-        div[data-testid="stVerticalBlock"] > div:has(> .stDataFrame),
-        div[data-testid="stVerticalBlock"] > div:has(> .stPlotlyChart),
-        div[data-testid="stVerticalBlock"] > div:has(> .stPyplot),
-        div[data-testid="stVerticalBlock"] > div:has(> .stVegaLiteChart) {
-            border-radius: 8px;
+        div[data-testid="stTabs"] button {
+            white-space: nowrap;
+            font-weight: 800;
         }
-
-        div[data-testid="stMetric"] {
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            background: var(--bg-secondary);
-            padding: 16px 18px;
-            box-shadow: var(--shadow-md);
-        }
-
-        /* Metric label and value colors */
-        div[data-testid="stMetric"] > div > div:first-child {
-            color: var(--text-secondary) !important;
-        }
-
-        div[data-testid="stMetric"] > div > div:nth-child(2) {
-            color: var(--text-primary) !important;
-        }
-
-        /* Ensure metric values are dark and visible on white background */
-        div[data-testid="stMetricDelta"] {
-            color: var(--text-primary) !important;
-        }
-
-        .stMetric label,
-        .stMetric h1,
-        .stMetric h2,
-        .stMetric h3,
-        .stMetric span {
-            color: var(--text-primary) !important;
-        }
-
         .stButton > button {
             width: 100%;
             border: 0;
-            border-radius: 8px;
-            background: linear-gradient(135deg, var(--primary-red), var(--primary-red-dark));
-            color: #fff;
-            font-weight: 800;
-            padding: 12px 18px;
-            box-shadow: var(--shadow-lg);
+            border-radius: 9px;
+            background: linear-gradient(135deg, #e4001b, #a80015);
+            color: white;
+            font-weight: 900;
+            min-height: 46px;
+            box-shadow: 0 14px 28px rgba(228,0,27,.25);
         }
-
-        .stButton > button:hover {
-            color: #fff;
-            border: 0;
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-xl);
-        }
-
-        input, textarea, select {
-            border-radius: 8px !important;
-            border: 1px solid var(--border-color) !important;
-            color: var(--text-primary) !important;
-        }
-
-        input::placeholder {
-            color: var(--text-tertiary) !important;
-        }
-
-        div[data-baseweb="input"],
-        div[data-baseweb="select"] {
-            border-radius: 8px;
-        }
-
-        div[data-baseweb="input"] input,
-        div[data-baseweb="select"] > div {
-            color: var(--text-primary) !important;
-            border-color: var(--border-color) !important;
-        }
-
-        /* Selectbox dropdown button and selected value */
-        div[data-testid="stSelectbox"] button {
-            color: var(--text-primary) !important;
-            background: var(--bg-secondary) !important;
-        }
-
-        /* Selectbox dropdown open menu styling */
-        div[data-testid="stSelectbox"] > div[data-baseweb="select"] {
-            background: var(--bg-secondary) !important;
-        }
-
-        div[data-testid="stSelectbox"] div[data-baseweb="select"] button {
-            background: var(--bg-secondary) !important;
-            color: var(--text-primary) !important;
-        }
-
-        /* Selectbox menu items and dropdown list */
-        [role="listbox"],
-        [role="option"] {
-            background: #1F2937 !important;
-            color: #FFFFFF !important;
-        }
-
-        [role="option"]:hover,
-        [role="option"][aria-selected="true"] {
-            background: #111827 !important;
-            color: #FFFFFF !important;
-        }
-
-        label {
-            color: var(--text-primary) !important;
-            font-weight: 600 !important;
-        }
-
-        /* Streamlit Slider styling */
-        div[data-testid="stSlider"] label {
-            color: var(--text-primary) !important;
-            font-weight: 700 !important;
-            font-size: 14px !important;
-            margin-bottom: 8px !important;
-        }
-
-        /* Streamlit Selectbox styling */
-        div[data-testid="stSelectbox"] label {
-            color: var(--text-primary) !important;
-            font-weight: 700 !important;
-            font-size: 14px !important;
-            margin-bottom: 8px !important;
-        }
-
-        /* Streamlit Multiselect styling */
-        div[data-testid="stMultiSelect"] label {
-            color: var(--text-primary) !important;
-            font-weight: 700 !important;
-            font-size: 14px !important;
-            margin-bottom: 8px !important;
-        }
-
-        /* Streamlit text input styling */
-        div[data-testid="stTextInput"] label {
-            color: var(--text-primary) !important;
-            font-weight: 700 !important;
-            font-size: 14px !important;
-            margin-bottom: 8px !important;
-        }
-
-        /* Streamlit number input styling */
-        div[data-testid="stNumberInput"] label {
-            color: var(--text-primary) !important;
-            font-weight: 700 !important;
-            font-size: 14px !important;
-            margin-bottom: 8px !important;
-        }
-
-        /* Streamlit text area styling */
-        div[data-testid="stTextArea"] label {
-            color: var(--text-primary) !important;
-            font-weight: 700 !important;
-            font-size: 14px !important;
-            margin-bottom: 8px !important;
-        }
-
-        /* Streamlit color picker styling */
-        div[data-testid="stColorPicker"] label {
-            color: var(--text-primary) !important;
-            font-weight: 700 !important;
-            font-size: 14px !important;
-            margin-bottom: 8px !important;
-        }
-
-        /* Streamlit date input styling */
-        div[data-testid="stDateInput"] label {
-            color: var(--text-primary) !important;
-            font-weight: 700 !important;
-            font-size: 14px !important;
-            margin-bottom: 8px !important;
-        }
-
-        /* Streamlit time input styling */
-        div[data-testid="stTimeInput"] label {
-            color: var(--text-primary) !important;
-            font-weight: 700 !important;
-            font-size: 14px !important;
-            margin-bottom: 8px !important;
-        }
-
-        /* Streamlit checkbox styling */
-        div[data-testid="stCheckbox"] label {
-            color: var(--text-primary) !important;
-            font-weight: 600 !important;
-            font-size: 14px !important;
-        }
-
-        /* Streamlit radio styling */
-        div[data-testid="stRadio"] label {
-            color: var(--text-primary) !important;
-            font-weight: 700 !important;
-            font-size: 14px !important;
-            margin-bottom: 8px !important;
-        }
-
-        /* Streamlit subheader styling */
-        h2 {
-            color: var(--text-primary) !important;
-            font-weight: 800 !important;
-        }
-
-        /* Streamlit caption styling */
-        small, .stCaption {
-            color: var(--text-secondary) !important;
-        }
-
-        div[data-testid="stAlert"] {
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            background: var(--bg-secondary);
-        }
-
-        .route-chip {
-            display: inline-block;
-            margin: 4px 8px 4px 0;
-            padding: 8px 14px;
-            border-radius: 999px;
-            background: var(--primary-red);
-            color: #ffffff;
-            font-size: 13px;
-            font-weight: 700;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .responsive-note {
-            display: none;
-            color: var(--text-secondary);
-            font-size: 12px;
-            line-height: 1.5;
-            margin: 2px 0 12px;
-        }
-
-        .loader-panel {
+        .loader {
+            border-radius: 10px;
+            background: linear-gradient(135deg, #111217, #272a33);
+            color: white;
+            padding: 16px;
             position: relative;
             overflow: hidden;
-            border-radius: 8px;
-            border: 1px solid rgba(229, 9, 20, 0.22);
-            background: linear-gradient(135deg, #1F2937, #111827);
-            padding: 18px 20px;
-            color: #ffffff;
-            box-shadow: var(--shadow-lg);
-            margin: 12px 0;
+            margin: 10px 0;
         }
-
-        .loader-panel::before {
+        .loader:before {
             content: "";
             position: absolute;
             inset: 0;
             transform: translateX(-100%);
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.16), transparent);
-            animation: shimmer 1.5s infinite;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,.18), transparent);
+            animation: sweep 1.2s infinite;
         }
-
-        .loader-title {
-            position: relative;
-            z-index: 1;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 15px;
-            font-weight: 700;
-        }
-
-        .signal-loader {
-            position: relative;
-            width: 38px;
-            height: 28px;
-            display: inline-flex;
-            align-items: end;
-            gap: 4px;
-        }
-
-        .signal-loader span {
-            display: block;
-            width: 7px;
-            border-radius: 999px;
-            background: var(--primary-red);
-            animation: signalRise 0.9s ease-in-out infinite;
-        }
-
-        .signal-loader span:nth-child(1) {
-            height: 10px;
-            animation-delay: 0s;
-        }
-
-        .signal-loader span:nth-child(2) {
-            height: 18px;
-            animation-delay: 0.12s;
-        }
-
-        .signal-loader span:nth-child(3) {
-            height: 26px;
-            animation-delay: 0.24s;
-        }
-
-        .loader-copy {
-            position: relative;
-            z-index: 1;
-            color: rgba(255,255,255,0.80);
-            margin-top: 8px;
-            font-size: 13px;
-            line-height: 1.5;
-        }
-
-        .risk-panel {
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            background: var(--bg-secondary);
-            padding: 20px;
-            box-shadow: var(--shadow-md);
-            margin: 8px 0 16px;
-        }
-
-        .risk-track {
-            height: 10px;
-            border-radius: 999px;
-            background: linear-gradient(90deg, #16a34a, #f59e0b, #e4001b);
-            margin-top: 10px;
-            overflow: hidden;
-        }
-
-        .risk-marker {
-            width: 3px;
-            height: 10px;
-            background: var(--text-primary);
-            margin-left: var(--risk-value);
-        }
-
-        .risk-label {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            color: var(--text-secondary);
-            font-size: 12px;
-            font-weight: 700;
-            margin-top: 10px;
-        }
-
-        @keyframes shimmer {
-            100% {
-                transform: translateX(100%);
-            }
-        }
-
-        @keyframes signalRise {
-            0%, 100% {
-                opacity: 0.45;
-                transform: scaleY(0.72);
-            }
-            50% {
-                opacity: 1;
-                transform: scaleY(1);
-            }
-        }
-
-        @media (max-width: 980px) {
-            .block-container {
-                max-width: 100%;
-                padding-left: 22px;
-                padding-right: 22px;
-            }
-
-            .hero-title {
-                max-width: 720px;
-                font-size: 36px;
-            }
-
-            .metric-card {
-                min-height: 96px;
-                margin-bottom: 10px;
-            }
-
-            div[data-testid="stMetric"] {
-                margin-bottom: 10px;
-            }
-        }
-
-        @media (max-width: 760px) {
-            .block-container {
-                padding-top: 18px;
-                padding-left: 14px;
-                padding-right: 14px;
-                padding-bottom: 32px;
-            }
-
-            .main-hero {
-                padding: 22px 18px;
-                margin-bottom: 16px;
-                box-shadow: 0 14px 34px rgba(20, 22, 28, 0.14);
-            }
-
-            .main-hero::after {
-                top: -92px;
-                right: -114px;
-                width: 220px;
-                height: 220px;
-                border-width: 26px;
-            }
-
-            .brand-row {
-                align-items: flex-start;
-                flex-direction: column;
-                gap: 12px;
-                margin-bottom: 20px;
-            }
-
-            .brand-mark {
-                font-size: 13px;
-            }
-
-            .brand-dot {
-                width: 30px;
-                height: 30px;
-            }
-
-            .status-pill {
-                font-size: 12px;
-                padding: 7px 10px;
-            }
-
-            .hero-title {
-                font-size: 28px;
-                line-height: 1.12;
-                max-width: 100%;
-            }
-
-            .hero-copy {
-                font-size: 14px;
-                line-height: 1.5;
-            }
-
-            .metric-card {
-                padding: 15px;
-                min-height: auto;
-            }
-
-            .metric-value {
-                font-size: 22px;
-                overflow-wrap: anywhere;
-            }
-
-            .section-title {
-                font-size: 19px;
-                margin-top: 14px;
-            }
-
-            .section-copy {
-                font-size: 13px;
-                margin-bottom: 14px;
-            }
-
-            div[data-testid="stTabs"] div[role="tablist"] {
-                padding-bottom: 4px;
-            }
-
-            div[data-testid="stTabs"] button {
-                font-size: 13px;
-                min-width: max-content;
-                padding-left: 10px;
-                padding-right: 10px;
-            }
-
-            .stButton > button {
-                min-height: 46px;
-                padding: 12px 14px;
-                font-size: 14px;
-            }
-
-            .loader-panel {
-                padding: 16px;
-            }
-
-            .loader-title {
-                align-items: flex-start;
-                font-size: 14px;
-            }
-
-            .risk-panel {
-                padding: 15px;
-                margin-top: 4px;
-            }
-
-            .route-chip {
-                font-size: 12px;
-                padding: 7px 9px;
-                margin-right: 5px;
-            }
-
-            .responsive-note {
-                display: block;
-            }
-
-            div[data-testid="stDataFrame"],
-            div[data-testid="stTable"],
-            div[data-testid="stVegaLiteChart"],
-            div[data-testid="stPyplot"] {
-                overflow-x: auto;
-            }
-
-            canvas,
-            svg {
-                max-width: 100% !important;
-            }
-        }
-
-        @media (max-width: 420px) {
-            .hero-title {
-                font-size: 24px;
-            }
-
-            .hero-copy {
-                font-size: 13px;
-            }
-
-            .metric-label {
-                font-size: 11px;
-            }
-
-            .metric-value {
-                font-size: 20px;
-            }
-
-            .signal-loader {
-                width: 32px;
-                min-width: 32px;
-            }
+        @keyframes sweep { to { transform: translateX(100%); } }
+        @media (max-width: 780px) {
+            .block-container { padding: 16px 13px 30px; }
+            .hero { padding: 22px 18px; }
+            .hero h1 { font-size: 27px; }
+            .hero p { font-size: 13px; }
+            .card { min-height: auto; margin-bottom: 8px; }
+            .value { font-size: 21px; }
         }
         </style>
         """,
-        unsafe_allow_html=True
+        unsafe_allow_html=True,
     )
-
-
-def metric_card(label, value, note):
-    st.markdown(
-        f"""
-        <div class="metric-card">
-            <div class="metric-label">{label}</div>
-            <div class="metric-value">{value}</div>
-            <div class="metric-note">{note}</div>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-
-def section_intro(title, copy):
-    st.markdown(
-        f"""
-        <div class="section-title">{title}</div>
-        <p class="section-copy">{copy}</p>
-        """,
-        unsafe_allow_html=True
-    )
-
-
-def premium_loader(title, copy):
-    st.markdown(
-        f"""
-        <div class="loader-panel">
-            <div class="loader-title">
-                <span class="signal-loader"><span></span><span></span><span></span></span>
-                {title}
-            </div>
-            <div class="loader-copy">{copy}</div>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-
-def estimate_risk(inputs):
-    risk = (
-        inputs["Latency"] * 0.33
-        + inputs["PacketLoss"] * 4.9
-        + inputs["Jitter"] * 0.7
-        + inputs["EdgeServerLoad"] * 0.36
-        + inputs["HandoverRate"] * 1.8
-        - inputs["Throughput"] * 0.025
-        - inputs["SignalStrength"] * 0.11
-    )
-    return max(0, min(100, round(risk, 1)))
-
-
-def risk_panel(score):
-    if score >= 70:
-        posture = "Critical congestion posture"
-    elif score >= 45:
-        posture = "Elevated network pressure"
-    else:
-        posture = "Stable operating posture"
-
-    st.markdown(
-        f"""
-        <div class="risk-panel">
-            <div class="metric-label">Live Risk Index</div>
-            <div class="metric-value">{score}%</div>
-            <div class="metric-note">{posture}</div>
-            <div class="risk-track" style="--risk-value: {score}%;">
-                <div class="risk-marker"></div>
-            </div>
-            <div class="risk-label"><span>Stable</span><span>Watch</span><span>Critical</span></div>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-
-@st.cache_resource
-def load_artifacts():
-    model = joblib.load("models/congestion_model.pkl")
-    congestion_encoder = joblib.load("models/congestion_label_encoder.pkl")
-    slice_encoder = joblib.load("models/network_slice_encoder.pkl")
-    return model, congestion_encoder, slice_encoder
 
 
 @st.cache_data
-def load_data():
-    raw = pd.read_csv("data/raw/network_data.csv")
-    processed = pd.read_csv("data/processed/processed_network_data.csv")
-    return raw, processed
+def sample_data(rows=900):
+    rng = np.random.default_rng(42)
+    data = pd.DataFrame(
+        {
+            "Users": rng.integers(100, 6500, rows),
+            "Bandwidth": rng.integers(80, 1800, rows),
+            "Latency": rng.normal(55, 28, rows).clip(5, 180),
+            "SignalStrength": rng.integers(35, 100, rows),
+            "PacketLoss": rng.normal(4, 3, rows).clip(0, 25),
+            "Throughput": rng.normal(650, 260, rows).clip(40, 1800),
+            "Jitter": rng.normal(10, 7, rows).clip(0.5, 55),
+            "EdgeServerLoad": rng.integers(10, 96, rows),
+            "NetworkSlice": rng.choice(["eMBB", "URLLC", "mMTC"], rows),
+        }
+    )
+    risk = (
+        data["Latency"] * 0.32
+        + data["PacketLoss"] * 5
+        + data["Jitter"] * 0.7
+        + data["EdgeServerLoad"] * 0.38
+        - data["Throughput"] * 0.025
+        - data["SignalStrength"] * 0.10
+    )
+    data["Congestion"] = np.select(
+        [risk >= 70, risk >= 45],
+        ["High", "Medium"],
+        default="Low",
+    )
+    data["Risk"] = risk.clip(0, 100).round(1)
+    return data
 
 
-def read_json(path):
-    if not os.path.exists(path):
-        return {}
-    with open(path, "r", encoding="utf-8") as file:
-        return json.load(file)
+def card(label, value):
+    st.markdown(
+        f'<div class="card"><div class="label">{label}</div><div class="value">{value}</div></div>',
+        unsafe_allow_html=True,
+    )
 
 
 def route_graph():
     graph = nx.Graph()
     links = [
-        ("Device_A", "Device_B", {"latency": 10, "packet_loss": 1.2, "bandwidth": 850, "congestion": 18}),
-        ("Device_A", "Device_C", {"latency": 15, "packet_loss": 2.0, "bandwidth": 700, "congestion": 25}),
-        ("Device_B", "Device_D", {"latency": 12, "packet_loss": 1.8, "bandwidth": 620, "congestion": 30}),
-        ("Device_C", "Device_D", {"latency": 10, "packet_loss": 3.1, "bandwidth": 480, "congestion": 42}),
-        ("Device_D", "Device_E", {"latency": 5, "packet_loss": 0.8, "bandwidth": 950, "congestion": 12}),
-        ("Device_E", "Device_F", {"latency": 8, "packet_loss": 1.0, "bandwidth": 900, "congestion": 16}),
-        ("Device_C", "Device_F", {"latency": 30, "packet_loss": 5.0, "bandwidth": 320, "congestion": 60})
+        ("Device_A", "Device_B", 24),
+        ("Device_A", "Device_C", 38),
+        ("Device_B", "Device_D", 31),
+        ("Device_C", "Device_D", 36),
+        ("Device_D", "Device_E", 18),
+        ("Device_E", "Device_F", 22),
+        ("Device_C", "Device_F", 64),
     ]
-
-    for source, target, metrics in links:
-        score = (
-            metrics["latency"]
-            + metrics["packet_loss"] * 7
-            + metrics["congestion"] * 0.45
-            + (1000 / metrics["bandwidth"]) * 8
-        )
-        graph.add_edge(source, target, optimization_score=round(score, 2), **metrics)
-
-    path = nx.shortest_path(
-        graph,
-        "Device_A",
-        "Device_F",
-        weight="optimization_score"
-    )
-    score = nx.shortest_path_length(
-        graph,
-        "Device_A",
-        "Device_F",
-        weight="optimization_score"
-    )
-    return graph, path, score
+    graph.add_weighted_edges_from(links)
+    path = nx.shortest_path(graph, "Device_A", "Device_F", weight="weight")
+    return graph, path, nx.shortest_path_length(graph, "Device_A", "Device_F", weight="weight")
 
 
-model, congestion_encoder, slice_encoder = load_artifacts()
-raw_data, processed_data = load_data()
-metrics = read_json("reports/model_metrics.json")
-
-apply_premium_theme()
+style()
+data = sample_data()
 
 st.markdown(
     """
-    <section class="main-hero">
-        <div class="brand-row">
-            <div class="brand-mark">AI Operations Console</div>
-            <div class="status-pill">AI Operations Console</div>
-        </div>
-        <h1 class="hero-title">AstraLink6G intelligence for premium network operations.</h1>
-        <p class="hero-copy">
-            A telecom-grade command experience for congestion prediction, interactive traffic simulation,
-            anomaly detection, model intelligence, and optimized 6G routing.
-        </p>
+    <section class="hero">
+        <div class="brand">Astralink6G</div>
+        <h1>Premium AI console for 6G network intelligence.</h1>
+        <p>Predict congestion, explore telemetry, detect risk, and optimize communication paths from one responsive dashboard.</p>
     </section>
     """,
-    unsafe_allow_html=True
+    unsafe_allow_html=True,
 )
 
-overview_cols = st.columns(4)
-with overview_cols[0]:
-    metric_card("Network Records", f"{len(raw_data):,}", "Synthetic 6G telemetry samples")
-with overview_cols[1]:
-    metric_card("Best Model", metrics.get("best_model", "Run training"), "Selected by test and CV score")
-with overview_cols[2]:
-    metric_card("Accuracy", metrics.get("accuracy", "N/A"), "Latest trained model result")
-with overview_cols[3]:
-    metric_card("High Congestion", int((raw_data["Congestion"] == "High").sum()), "Records needing attention")
+m1, m2, m3, m4 = st.columns(4)
+with m1:
+    card("Telemetry Records", f"{len(data):,}")
+with m2:
+    card("High Congestion", int((data["Congestion"] == "High").sum()))
+with m3:
+    card("Avg Risk", f"{data['Risk'].mean():.1f}%")
+with m4:
+    card("AI Status", "Active")
 
-prediction_tab, analytics_tab, model_tab, anomaly_tab, routing_tab = st.tabs([
-    "Prediction",
-    "Traffic Analytics",
-    "Model Insights",
-    "Anomaly Detection",
-    "Smart Routing"
-])
+tab1, tab2, tab3, tab4 = st.tabs(["Prediction", "Analytics", "Risk Insights", "Smart Routing"])
 
-st.markdown(
-    '<p class="responsive-note">Swipe the tab row horizontally to explore every AstraLink module.</p>',
-    unsafe_allow_html=True
-)
+with tab1:
+    st.subheader("Congestion Prediction")
+    scenario = st.selectbox("Scenario", ["Balanced city cell", "Metro peak load", "Ultra-low latency slice"])
+    defaults = {
+        "Balanced city cell": [1200, 820, 34, 82, 2.4, 610, 7.5, 42],
+        "Metro peak load": [5400, 520, 112, 58, 9.8, 280, 24.0, 86],
+        "Ultra-low latency slice": [900, 1450, 12, 91, 0.8, 1120, 2.4, 28],
+    }[scenario]
 
-with prediction_tab:
-    section_intro(
-        "Network Congestion Prediction",
-        "Enter network conditions and get a class prediction with model confidence."
-    )
-
-    scenarios = {
-        "Balanced city cell": {
-            "users": 1200,
-            "bandwidth": 820,
-            "latency": 34,
-            "signal": 82,
-            "packet_loss": 2.4,
-            "throughput": 610.0,
-            "jitter": 7.5,
-            "energy": 48.0,
-            "handover": 2.1,
-            "mobility": 32,
-            "edge_load": 42,
-            "network_slice": "eMBB"
-        },
-        "Metro peak load": {
-            "users": 5400,
-            "bandwidth": 520,
-            "latency": 112,
-            "signal": 58,
-            "packet_loss": 9.8,
-            "throughput": 280.0,
-            "jitter": 24.0,
-            "energy": 92.0,
-            "handover": 7.4,
-            "mobility": 76,
-            "edge_load": 86,
-            "network_slice": "eMBB"
-        },
-        "Ultra-low latency slice": {
-            "users": 900,
-            "bandwidth": 1450,
-            "latency": 12,
-            "signal": 91,
-            "packet_loss": 0.8,
-            "throughput": 1120.0,
-            "jitter": 2.4,
-            "energy": 38.0,
-            "handover": 1.2,
-            "mobility": 18,
-            "edge_load": 28,
-            "network_slice": "URLLC"
-        },
-        "High mobility handover": {
-            "users": 2600,
-            "bandwidth": 760,
-            "latency": 74,
-            "signal": 66,
-            "packet_loss": 5.6,
-            "throughput": 430.0,
-            "jitter": 16.5,
-            "energy": 76.0,
-            "handover": 10.2,
-            "mobility": 150,
-            "edge_load": 68,
-            "network_slice": "URLLC"
-        }
-    }
-
-    scenario_name = st.selectbox("Network Scenario", list(scenarios.keys()))
-    scenario = scenarios[scenario_name]
-
-    left, right, live = st.columns([1, 1, 0.9])
-
+    left, right = st.columns(2)
     with left:
-        users = st.slider("Users", 100, 6500, scenario["users"])
-        bandwidth = st.slider("Bandwidth (Mbps)", 80, 1800, scenario["bandwidth"])
-        latency = st.slider("Latency (ms)", 5, 180, scenario["latency"])
-        signal = st.slider("Signal Strength", 35, 100, scenario["signal"])
-        packet_loss = st.slider("Packet Loss (%)", 0.0, 25.0, scenario["packet_loss"])
-        throughput = st.slider("Throughput (Mbps)", 5.0, 1800.0, scenario["throughput"])
-
+        users = st.slider("Users", 100, 6500, defaults[0])
+        bandwidth = st.slider("Bandwidth", 80, 1800, defaults[1])
+        latency = st.slider("Latency", 5, 180, defaults[2])
+        signal = st.slider("Signal Strength", 35, 100, defaults[3])
     with right:
-        jitter = st.slider("Jitter (ms)", 0.5, 55.0, scenario["jitter"])
-        energy = st.slider("Energy Consumption", 8.0, 130.0, scenario["energy"])
-        handover = st.slider("Handover Rate", 0.0, 12.0, scenario["handover"])
-        mobility = st.slider("Mobility Speed (km/h)", 0, 180, scenario["mobility"])
-        edge_load = st.slider("Edge Server Load (%)", 10, 95, scenario["edge_load"])
-        network_slice = st.selectbox(
-            "Network Slice",
-            list(slice_encoder.classes_),
-            index=list(slice_encoder.classes_).index(scenario["network_slice"])
-        )
+        packet_loss = st.slider("Packet Loss", 0.0, 25.0, float(defaults[4]))
+        throughput = st.slider("Throughput", 40, 1800, defaults[5])
+        jitter = st.slider("Jitter", 0.5, 55.0, float(defaults[6]))
+        edge_load = st.slider("Edge Server Load", 10, 95, defaults[7])
 
-    input_data = pd.DataFrame({
-        "Users": [users],
-        "Bandwidth": [bandwidth],
-        "Latency": [latency],
-        "SignalStrength": [signal],
-        "PacketLoss": [packet_loss],
-        "Throughput": [throughput],
-        "Jitter": [jitter],
-        "EnergyConsumption": [energy],
-        "HandoverRate": [handover],
-        "MobilitySpeed": [mobility],
-        "EdgeServerLoad": [edge_load],
-        "NetworkSlice": slice_encoder.transform([network_slice])
-    })
+    risk = latency * 0.32 + packet_loss * 5 + jitter * 0.7 + edge_load * 0.38 - throughput * 0.025 - signal * 0.1
+    risk = max(0, min(100, round(risk, 1)))
+    label = "High" if risk >= 70 else "Medium" if risk >= 45 else "Low"
+    st.progress(int(risk), text=f"Live Risk Index: {risk}%")
 
-    live_inputs = input_data.iloc[0].to_dict()
-    live_inputs["NetworkSlice"] = network_slice
-    with live:
-        risk_panel(estimate_risk(live_inputs))
-        st.metric("Scenario", scenario_name)
-        st.metric("Slice", network_slice)
-
-    predict_clicked = st.button("Run AstraLink AI Prediction")
-
-    if predict_clicked:
-        loader_slot = st.empty()
-        with loader_slot:
-            premium_loader(
-                "AstraLink AI is scanning the network state",
-                "Evaluating latency pressure, throughput health, edge load, packet loss, and slice behavior."
-            )
-        time.sleep(0.8)
-        loader_slot.empty()
-
-        prediction = model.predict(input_data)
-        label = congestion_encoder.inverse_transform(prediction)[0]
-        probabilities = model.predict_proba(input_data)[0]
-        probability_df = pd.DataFrame({
-            "Congestion": congestion_encoder.inverse_transform(model.classes_),
-            "Confidence": probabilities
-        }).sort_values("Confidence", ascending=False)
-
+    if st.button("Run Astralink AI Prediction"):
+        slot = st.empty()
+        slot.markdown('<div class="loader">Scanning live network posture...</div>', unsafe_allow_html=True)
+        time.sleep(0.7)
+        slot.empty()
         if label == "High":
             st.error(f"Predicted Congestion: {label}")
         elif label == "Medium":
@@ -1069,144 +267,30 @@ with prediction_tab:
         else:
             st.success(f"Predicted Congestion: {label}")
 
-        st.metric("Top Confidence", f"{probability_df.iloc[0]['Confidence']:.2%}")
-        st.bar_chart(probability_df.set_index("Congestion"))
+with tab2:
+    st.subheader("Network Analytics")
+    selected_slice = st.selectbox("Network Slice", ["All", "eMBB", "URLLC", "mMTC"])
+    filtered = data if selected_slice == "All" else data[data["NetworkSlice"] == selected_slice]
+    window = st.slider("Telemetry Window", 100, len(filtered), min(500, len(filtered)))
+    metrics = st.multiselect("Metrics", ["Latency", "PacketLoss", "Throughput", "Jitter", "EdgeServerLoad"], ["Latency", "PacketLoss", "Jitter"])
+    if metrics:
+        st.line_chart(filtered[metrics].head(window).reset_index(drop=True))
+    st.bar_chart(filtered["Congestion"].value_counts())
 
-with analytics_tab:
-    section_intro(
-        "Network Traffic Analytics",
-        "Review traffic distribution, slice behavior, and performance trends across the generated network."
-    )
+with tab3:
+    st.subheader("Risk Insights")
+    st.dataframe(filtered.sort_values("Risk", ascending=False).head(20), width="stretch")
+    st.bar_chart(pd.Series({"Packet Loss": .31, "Latency": .25, "Jitter": .18, "Edge Load": .15, "Throughput": .11}))
 
-    col1, col2 = st.columns(2)
-    with col1:
-        st.subheader("Congestion Distribution")
-        st.bar_chart(raw_data["Congestion"].value_counts())
-    with col2:
-        st.subheader("Network Slice Distribution")
-        st.bar_chart(raw_data["NetworkSlice"].value_counts())
-
-    selected_slice = st.selectbox(
-        "Filter by Network Slice",
-        ["All"] + sorted(raw_data["NetworkSlice"].unique().tolist())
-    )
-    filtered_data = raw_data if selected_slice == "All" else raw_data[raw_data["NetworkSlice"] == selected_slice]
-
-    trend_cols = st.columns([1, 1])
-    with trend_cols[0]:
-        sample_size = st.slider(
-            "Telemetry Window",
-            100,
-            min(1000, len(filtered_data)),
-            min(500, len(filtered_data))
-        )
-    with trend_cols[1]:
-        trend_metrics = st.multiselect(
-            "Trend Metrics",
-            ["Latency", "Jitter", "PacketLoss", "Throughput", "EdgeServerLoad"],
-            ["Latency", "Jitter", "PacketLoss"]
-        )
-
-    st.subheader("Live-Style Telemetry Trends")
-    if trend_metrics:
-        st.line_chart(filtered_data[trend_metrics].head(sample_size).reset_index(drop=True))
-    else:
-        st.info("Choose at least one metric to render the trend chart.")
-
-    st.subheader("Throughput vs Edge Server Load")
-    st.scatter_chart(
-        filtered_data,
-        x="EdgeServerLoad",
-        y="Throughput",
-        color="Congestion"
-    )
-
-with model_tab:
-    section_intro(
-        "Model Insights",
-        "Compare trained models and inspect which network features drive congestion decisions."
-    )
-
-    if os.path.exists("reports/model_comparison.csv"):
-        st.subheader("Model Comparison")
-        st.dataframe(pd.read_csv("reports/model_comparison.csv"), width="stretch")
-
-    if os.path.exists("reports/feature_importance.csv"):
-        st.subheader("Feature Importance")
-        feature_importance = pd.read_csv("reports/feature_importance.csv")
-        st.bar_chart(feature_importance.set_index("Feature"))
-
-    if os.path.exists("reports/confusion_matrix.csv"):
-        st.subheader("Confusion Matrix")
-        st.dataframe(pd.read_csv("reports/confusion_matrix.csv"), width="stretch")
-
-with anomaly_tab:
-    section_intro(
-        "Anomaly Detection",
-        "Surface abnormal telemetry patterns that may indicate latency spikes, packet loss, or overload."
-    )
-
-    if os.path.exists("reports/anomaly_detection.csv"):
-        anomalies = pd.read_csv("reports/anomaly_detection.csv")
-        col1, col2 = st.columns(2)
-        col1.metric("Anomalies", int((anomalies["AnomalyLabel"] == "Anomaly").sum()))
-        col2.metric("Normal Records", int((anomalies["AnomalyLabel"] == "Normal").sum()))
-        st.bar_chart(anomalies["AnomalyLabel"].value_counts())
-        st.subheader("Most Critical Anomalies")
-        st.dataframe(
-            anomalies.sort_values("AnomalyScore").head(15),
-            width="stretch"
-        )
-    else:
-        st.info("Run `python src/anomaly_detection.py` to generate anomaly reports.")
-
-with routing_tab:
-    section_intro(
-        "Smart Multi-Factor Routing",
-        "Find the best path using latency, packet loss, bandwidth, and congestion pressure together."
-    )
-
+with tab4:
+    st.subheader("Smart Routing")
     graph, path, score = route_graph()
-    route_cols = st.columns([2, 1])
-    with route_cols[0]:
-        chips = "".join(f'<span class="route-chip">{node}</span>' for node in path)
-        st.markdown(chips, unsafe_allow_html=True)
-    with route_cols[1]:
-        st.metric("Optimization Score", round(score, 2))
-
+    st.success("Best Route: " + " -> ".join(path))
+    st.metric("Optimization Score", score)
     pos = nx.spring_layout(graph, seed=42)
-    fig, ax = plt.subplots(figsize=(7.8, 5.4), dpi=120)
-    fig.patch.set_facecolor("#ffffff")
-    ax.set_facecolor("#ffffff")
-    nx.draw(
-        graph,
-        pos,
-        ax=ax,
-        with_labels=True,
-        node_size=2600,
-        node_color="#e4001b",
-        edge_color="#202228",
-        font_weight="bold",
-        font_color="#ffffff"
-    )
-    labels = {
-        (u, v): f"L:{d['latency']} P:{d['packet_loss']} S:{d['optimization_score']}"
-        for u, v, d in graph.edges(data=True)
-    }
-    nx.draw_networkx_edge_labels(
-        graph,
-        pos,
-        edge_labels=labels,
-        ax=ax,
-        font_size=8,
-        bbox={"boxstyle": "round,pad=0.24", "fc": "#ffffff", "ec": "#eceef2"}
-    )
-    ax.set_title(
-        "Latency, Packet Loss, Bandwidth, and Congestion Aware Routing",
-        fontsize=13,
-        fontweight="bold",
-        color="#101114"
-    )
+    fig, ax = plt.subplots(figsize=(7.6, 5.2), dpi=120)
+    nx.draw(graph, pos, ax=ax, with_labels=True, node_color="#e4001b", edge_color="#202228", font_color="white", node_size=2300, font_weight="bold")
+    nx.draw_networkx_edge_labels(graph, pos, edge_labels=nx.get_edge_attributes(graph, "weight"), ax=ax)
     ax.axis("off")
     fig.tight_layout()
     st.pyplot(fig)

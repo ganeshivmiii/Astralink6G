@@ -16,3 +16,19 @@ __pycache__/
 Thumbs.db
 
 *.log
+
+__pycache__/
+*.pyc
+
+.venv/
+venv/
+
+models/*.pkl
+
+.streamlit/
+
+*.csv
+!data/raw/network_data.csv
+!data/processed/processed_network_data.csv
+
+.vscode/
