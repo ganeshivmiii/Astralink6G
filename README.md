@@ -80,5 +80,4 @@ Future Scope
 - Add energy-aware optimization for green 6G communication.
 - Add edge-cloud task offloading recommendations.
 - Connect the dashboard to a real-time alerting channel.
-=======
 
