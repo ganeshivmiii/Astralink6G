@@ -42,6 +42,11 @@ def style():
             padding-top: 26px;
             padding-bottom: 38px;
         }
+        .top-logo {
+            width: min(260px, 72vw);
+            display: block;
+            margin: 0 0 18px;
+        }
         .hero {
             position: relative;
             overflow: hidden;
@@ -63,13 +68,6 @@ def style():
             height: 260px;
             border: 32px solid rgba(255,255,255,.15);
             border-radius: 50%;
-        }
-        .brand-logo {
-            position: relative;
-            z-index: 1;
-            width: min(230px, 66vw);
-            margin-bottom: 28px;
-            display: block;
         }
         .hero h1 {
             position: relative;
@@ -163,6 +161,21 @@ def style():
             min-height: 46px;
             box-shadow: 0 14px 28px rgba(228,0,27,.25);
         }
+        .mini-control button {
+            min-height: 38px;
+            padding: 0;
+        }
+        div[data-testid="stNumberInput"] input {
+            background: #ffffff !important;
+            color: #111217 !important;
+            border: 1px solid #d8dce3 !important;
+            border-radius: 8px !important;
+            font-weight: 800 !important;
+        }
+        div[data-testid="stNumberInput"] button {
+            color: #111217 !important;
+            border-color: #d8dce3 !important;
+        }
         .loader {
             border-radius: 10px;
             background: linear-gradient(135deg, #111217, #272a33);
@@ -184,7 +197,7 @@ def style():
         @media (max-width: 780px) {
             .block-container { padding: 16px 13px 30px; }
             .hero { padding: 22px 18px; min-height: auto; }
-            .brand-logo { width: min(190px, 72vw); margin-bottom: 22px; }
+            .top-logo { width: min(210px, 74vw); margin-bottom: 14px; }
             .hero h1 { font-size: 27px; line-height: 1.14; }
             .hero p { font-size: 13px; }
             .card { min-height: auto; margin-bottom: 8px; }
@@ -242,6 +255,44 @@ def card(label, value):
     )
 
 
+def value_control(label, min_value, max_value, default, step, key):
+    if key not in st.session_state:
+        st.session_state[key] = default
+
+    c1, c2, c3 = st.columns([0.16, 0.68, 0.16])
+    with c1:
+        st.markdown('<div class="mini-control">', unsafe_allow_html=True)
+        if st.button("-", key=f"{key}_minus"):
+            st.session_state[key] = max(min_value, st.session_state[key] - step)
+        st.markdown("</div>", unsafe_allow_html=True)
+    with c3:
+        st.markdown('<div class="mini-control">', unsafe_allow_html=True)
+        if st.button("+", key=f"{key}_plus"):
+            st.session_state[key] = min(max_value, st.session_state[key] + step)
+        st.markdown("</div>", unsafe_allow_html=True)
+    with c2:
+        value = st.number_input(
+            label,
+            min_value=min_value,
+            max_value=max_value,
+            value=st.session_state[key],
+            step=step,
+            key=f"{key}_number",
+        )
+
+    slider_value = st.slider(
+        f"{label} slider",
+        min_value=min_value,
+        max_value=max_value,
+        value=value,
+        step=step,
+        key=f"{key}_slider",
+        label_visibility="collapsed",
+    )
+    st.session_state[key] = slider_value
+    return slider_value
+
+
 def route_graph():
     graph = nx.Graph()
     links = [
@@ -261,12 +312,12 @@ def route_graph():
 style()
 data = sample_data()
 logo = asset_uri("assets/astralink6g_white.svg")
-logo_html = f'<img class="brand-logo" src="{logo}" alt="Astralink6G logo" />' if logo else '<div class="brand-logo">Astralink6G</div>'
+logo_html = f'<img class="top-logo" src="{logo}" alt="Astralink6G logo" />' if logo else '<h2>Astralink6G</h2>'
 
 st.markdown(
     f"""
+    {logo_html}
     <section class="hero">
-        {logo_html}
         <h1>Premium AI console for 6G network intelligence.</h1>
         <p>Predict congestion, explore telemetry, detect risk, and optimize communication paths from one responsive dashboard.</p>
     </section>
@@ -297,15 +348,15 @@ with tab1:
 
     left, right = st.columns(2)
     with left:
-        users = st.slider("Users", 100, 6500, defaults[0])
-        bandwidth = st.slider("Bandwidth", 80, 1800, defaults[1])
-        latency = st.slider("Latency", 5, 180, defaults[2])
-        signal = st.slider("Signal Strength", 35, 100, defaults[3])
+        users = value_control("Users", 100, 6500, defaults[0], 50, "users")
+        bandwidth = value_control("Bandwidth", 80, 1800, defaults[1], 10, "bandwidth")
+        latency = value_control("Latency", 5, 180, defaults[2], 1, "latency")
+        signal = value_control("Signal Strength", 35, 100, defaults[3], 1, "signal")
     with right:
-        packet_loss = st.slider("Packet Loss", 0.0, 25.0, float(defaults[4]))
-        throughput = st.slider("Throughput", 40, 1800, defaults[5])
-        jitter = st.slider("Jitter", 0.5, 55.0, float(defaults[6]))
-        edge_load = st.slider("Edge Server Load", 10, 95, defaults[7])
+        packet_loss = value_control("Packet Loss", 0.0, 25.0, float(defaults[4]), 0.1, "packet_loss")
+        throughput = value_control("Throughput", 40, 1800, defaults[5], 10, "throughput")
+        jitter = value_control("Jitter", 0.5, 55.0, float(defaults[6]), 0.5, "jitter")
+        edge_load = value_control("Edge Server Load", 10, 95, defaults[7], 1, "edge_load")
 
     risk = latency * 0.32 + packet_loss * 5 + jitter * 0.7 + edge_load * 0.38 - throughput * 0.025 - signal * 0.1
     risk = max(0, min(100, round(risk, 1)))
