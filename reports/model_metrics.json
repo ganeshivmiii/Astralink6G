@@ -1,0 +1,18 @@
+{
+  "best_model": "Gradient Boosting",
+  "accuracy": 0.928,
+  "features": [
+    "Users",
+    "Bandwidth",
+    "Latency",
+    "SignalStrength",
+    "PacketLoss",
+    "Throughput",
+    "Jitter",
+    "EnergyConsumption",
+    "HandoverRate",
+    "MobilitySpeed",
+    "EdgeServerLoad",
+    "NetworkSlice"
+  ]
+}

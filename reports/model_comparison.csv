@@ -1,0 +1,4 @@
+Model,Accuracy,CVMean,CVStd
+Gradient Boosting,0.928,0.917,0.0107
+Random Forest,0.914,0.908,0.0086
+SVM,0.57,0.5675,0.0202
