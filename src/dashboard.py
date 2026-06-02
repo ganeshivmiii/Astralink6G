@@ -1,4 +1,5 @@
 import time
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -7,7 +8,16 @@ import pandas as pd
 import streamlit as st
 
 
-st.set_page_config(page_title="Astralink6G", page_icon="A", layout="wide")
+st.set_page_config(page_title="Astralink6G", page_icon="assets/favicon.svg", layout="wide")
+
+
+def asset_uri(path):
+    file = Path(path)
+    if not file.exists():
+        return ""
+    import base64
+
+    return "data:image/svg+xml;base64," + base64.b64encode(file.read_bytes()).decode("ascii")
 
 
 def style():
@@ -21,25 +31,28 @@ def style():
             --line: #eceef2;
         }
         .stApp {
-            background: linear-gradient(180deg, #fff 0%, #f7f8fb 55%, #fff 100%);
+            background: #f5f6f8;
             color: var(--dark);
         }
         #MainMenu, footer, [data-testid="stDeployButton"] {
             display: none;
         }
         .block-container {
-            max-width: 1180px;
+            max-width: 1200px;
             padding-top: 26px;
             padding-bottom: 38px;
         }
         .hero {
             position: relative;
             overflow: hidden;
-            border-radius: 10px;
-            padding: 30px;
-            background: linear-gradient(135deg, #e4001b, #aa0015);
+            border-radius: 12px;
+            padding: 34px;
+            background:
+                radial-gradient(circle at 92% 0%, rgba(255,255,255,.22) 0 16%, transparent 17%),
+                linear-gradient(135deg, #e4001b, #b00016 72%);
             box-shadow: 0 20px 48px rgba(20, 22, 28, .16);
-            margin-bottom: 18px;
+            margin-bottom: 20px;
+            min-height: 290px;
         }
         .hero:after {
             content: "";
@@ -51,12 +64,12 @@ def style():
             border: 32px solid rgba(255,255,255,.15);
             border-radius: 50%;
         }
-        .brand {
-            color: white;
-            font-weight: 900;
-            font-size: 15px;
-            text-transform: uppercase;
-            margin-bottom: 22px;
+        .brand-logo {
+            position: relative;
+            z-index: 1;
+            width: min(230px, 66vw);
+            margin-bottom: 28px;
+            display: block;
         }
         .hero h1 {
             position: relative;
@@ -67,14 +80,16 @@ def style():
             font-size: 42px;
             line-height: 1.08;
             letter-spacing: 0;
+            text-shadow: 0 2px 18px rgba(0,0,0,.18);
         }
         .hero p {
             position: relative;
             z-index: 1;
             max-width: 680px;
-            color: rgba(255,255,255,.86);
+            color: #fff;
             font-size: 15px;
             line-height: 1.55;
+            font-weight: 600;
         }
         .card {
             border: 1px solid var(--line);
@@ -104,6 +119,39 @@ def style():
         div[data-testid="stTabs"] button {
             white-space: nowrap;
             font-weight: 800;
+            color: #4b5563 !important;
+        }
+        div[data-testid="stTabs"] button[aria-selected="true"] {
+            color: #e4001b !important;
+        }
+        .stMarkdown, .stText, p, label, span, h1, h2, h3, h4 {
+            color: #111217;
+        }
+        div[data-testid="stWidgetLabel"] label,
+        div[data-testid="stWidgetLabel"] p,
+        .stSlider label,
+        .stSelectbox label,
+        .stMultiSelect label {
+            color: #111217 !important;
+            font-weight: 800 !important;
+        }
+        div[data-baseweb="select"] > div {
+            background: #fff !important;
+            color: #111217 !important;
+            border: 1px solid #d8dce3 !important;
+        }
+        div[data-baseweb="select"] span {
+            color: #111217 !important;
+        }
+        div[data-testid="stSlider"] [data-baseweb="slider"] div {
+            color: #111217 !important;
+        }
+        div[data-testid="stSlider"] [role="slider"] {
+            background: #e4001b !important;
+            border-color: #e4001b !important;
+        }
+        div[data-testid="stSlider"] [data-testid="stTickBar"] {
+            color: #111217 !important;
         }
         .stButton > button {
             width: 100%;
@@ -135,11 +183,18 @@ def style():
         @keyframes sweep { to { transform: translateX(100%); } }
         @media (max-width: 780px) {
             .block-container { padding: 16px 13px 30px; }
-            .hero { padding: 22px 18px; }
-            .hero h1 { font-size: 27px; }
+            .hero { padding: 22px 18px; min-height: auto; }
+            .brand-logo { width: min(190px, 72vw); margin-bottom: 22px; }
+            .hero h1 { font-size: 27px; line-height: 1.14; }
             .hero p { font-size: 13px; }
             .card { min-height: auto; margin-bottom: 8px; }
             .value { font-size: 21px; }
+            div[data-testid="stHorizontalBlock"] { gap: .65rem; }
+            div[data-testid="stTabs"] button { font-size: 13px; padding-left: 10px; padding-right: 10px; }
+        }
+        @media (max-width: 430px) {
+            .hero h1 { font-size: 23px; }
+            .hero { border-radius: 10px; }
         }
         </style>
         """,
@@ -205,11 +260,13 @@ def route_graph():
 
 style()
 data = sample_data()
+logo = asset_uri("assets/astralink6g_white.svg")
+logo_html = f'<img class="brand-logo" src="{logo}" alt="Astralink6G logo" />' if logo else '<div class="brand-logo">Astralink6G</div>'
 
 st.markdown(
-    """
+    f"""
     <section class="hero">
-        <div class="brand">Astralink6G</div>
+        {logo_html}
         <h1>Premium AI console for 6G network intelligence.</h1>
         <p>Predict congestion, explore telemetry, detect risk, and optimize communication paths from one responsive dashboard.</p>
     </section>
