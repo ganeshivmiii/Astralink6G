@@ -10,13 +10,17 @@ import streamlit as st
 
 
 st.set_page_config(
-    page_title="AstraLink 6G",
-    page_icon="A",
+    page_title="Astralink6G",
+    page_icon="assets/favicon.svg",
     layout="wide"
 )
 
 
 def apply_premium_theme():
+    st.image(
+        "assets/astralink6g_white.svg",
+        width=260
+    )
     st.markdown(
         """
         <style>
@@ -719,10 +723,10 @@ st.markdown(
     """
     <section class="main-hero">
         <div class="brand-row">
-            <div class="brand-mark"><span class="brand-dot">A</span> AstraLink 6G</div>
+            <div class="brand-mark">AI Operations Console</div>
             <div class="status-pill">AI Operations Console</div>
         </div>
-        <h1 class="hero-title">AstraLink 6G intelligence for premium network operations.</h1>
+        <h1 class="hero-title">AstraLink6G intelligence for premium network operations.</h1>
         <p class="hero-copy">
             A telecom-grade command experience for congestion prediction, interactive traffic simulation,
             anomaly detection, model intelligence, and optimized 6G routing.
