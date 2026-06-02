@@ -27,13 +27,18 @@ def apply_premium_theme():
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
         :root {
-            --airtel-red: #e4001b;
-            --airtel-deep-red: #b00016;
-            --ink: #101114;
-            --muted: #6f737c;
-            --line: #eceef2;
-            --soft: #f7f8fa;
-            --white: #ffffff;
+            --primary-red: #E50914;
+            --primary-red-dark: #B8050D;
+            --bg-primary: #F8FAFC;
+            --bg-secondary: #FFFFFF;
+            --text-primary: #111827;
+            --text-secondary: #374151;
+            --text-tertiary: #6B7280;
+            --border-color: #E5E7EB;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+            --shadow-lg: 0 10px 24px rgba(0,0,0,0.10);
+            --shadow-xl: 0 20px 48px rgba(0,0,0,0.12);
         }
 
         html, body, [class*="css"] {
@@ -41,10 +46,8 @@ def apply_premium_theme():
         }
 
         .stApp {
-            background:
-                radial-gradient(circle at 8% 0%, rgba(228, 0, 27, 0.10), transparent 32%),
-                linear-gradient(180deg, #ffffff 0%, #f7f8fb 44%, #ffffff 100%);
-            color: var(--ink);
+            background: linear-gradient(180deg, #F8FAFC 0%, #FFFFFF 100%);
+            color: var(--text-primary);
         }
 
         .block-container {
@@ -61,12 +64,12 @@ def apply_premium_theme():
             position: relative;
             overflow: hidden;
             padding: 32px 34px;
-            border: 1px solid rgba(228, 0, 27, 0.16);
+            border: 1px solid rgba(229, 9, 20, 0.16);
             border-radius: 8px;
             background:
-                linear-gradient(135deg, rgba(228, 0, 27, 0.96), rgba(176, 0, 22, 0.96)),
-                repeating-linear-gradient(120deg, rgba(255,255,255,0.10) 0 1px, transparent 1px 28px);
-            box-shadow: 0 20px 48px rgba(20, 22, 28, 0.16);
+                linear-gradient(135deg, #E50914, #B8050D),
+                repeating-linear-gradient(120deg, rgba(255,255,255,0.12) 0 1px, transparent 1px 28px);
+            box-shadow: var(--shadow-xl);
             margin-bottom: 22px;
         }
 
@@ -107,12 +110,12 @@ def apply_premium_theme():
             height: 34px;
             border-radius: 50%;
             background: #fff;
-            color: var(--airtel-red);
+            color: var(--primary-red);
             display: inline-flex;
             align-items: center;
             justify-content: center;
             font-weight: 900;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.18);
+            box-shadow: var(--shadow-lg);
         }
 
         .status-pill {
@@ -150,61 +153,61 @@ def apply_premium_theme():
         .metric-card {
             padding: 18px 18px 16px;
             border-radius: 8px;
-            border: 1px solid var(--line);
-            background: rgba(255,255,255,0.92);
-            box-shadow: 0 12px 30px rgba(20, 22, 28, 0.08);
+            border: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+            box-shadow: var(--shadow-md);
             min-height: 104px;
         }
 
         .metric-label {
-            color: var(--muted);
+            color: var(--text-secondary);
             font-size: 12px;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0;
+            letter-spacing: 0.5px;
             margin-bottom: 9px;
         }
 
         .metric-value {
-            color: var(--ink);
-            font-size: 26px;
+            color: var(--text-primary);
+            font-size: 28px;
             font-weight: 800;
             line-height: 1.1;
         }
 
         .metric-note {
             margin-top: 7px;
-            color: var(--muted);
+            color: var(--text-secondary);
             font-size: 12px;
             font-weight: 500;
         }
 
         .section-title {
-            margin: 18px 0 8px;
-            color: var(--ink);
-            font-size: 22px;
+            margin: 24px 0 12px;
+            color: var(--text-primary);
+            font-size: 24px;
             line-height: 1.2;
             font-weight: 800;
-            letter-spacing: 0;
+            letter-spacing: -0.3px;
         }
 
         .section-copy {
-            margin: 0 0 18px;
-            color: var(--muted);
+            margin: 0 0 20px;
+            color: var(--text-secondary);
             font-size: 14px;
-            line-height: 1.55;
+            line-height: 1.6;
         }
 
         div[data-testid="stTabs"] button {
             border-radius: 8px 8px 0 0;
-            color: #40434a;
+            color: var(--text-secondary);
             font-weight: 700;
             white-space: nowrap;
         }
 
         div[data-testid="stTabs"] button[aria-selected="true"] {
-            color: var(--airtel-red);
-            border-bottom-color: var(--airtel-red);
+            color: var(--primary-red);
+            border-bottom-color: var(--primary-red);
         }
 
         div[data-testid="stTabs"] div[role="tablist"] {
@@ -221,33 +224,39 @@ def apply_premium_theme():
         }
 
         div[data-testid="stMetric"] {
-            border: 1px solid var(--line);
+            border: 1px solid var(--border-color);
             border-radius: 8px;
-            background: #ffffff;
-            padding: 14px 16px;
-            box-shadow: 0 10px 24px rgba(20, 22, 28, 0.06);
+            background: var(--bg-secondary);
+            padding: 16px 18px;
+            box-shadow: var(--shadow-md);
         }
 
         .stButton > button {
             width: 100%;
             border: 0;
             border-radius: 8px;
-            background: linear-gradient(135deg, var(--airtel-red), var(--airtel-deep-red));
+            background: linear-gradient(135deg, var(--primary-red), var(--primary-red-dark));
             color: #fff;
             font-weight: 800;
             padding: 12px 18px;
-            box-shadow: 0 12px 26px rgba(228, 0, 27, 0.24);
+            box-shadow: var(--shadow-lg);
         }
 
         .stButton > button:hover {
             color: #fff;
             border: 0;
-            transform: translateY(-1px);
-            box-shadow: 0 16px 34px rgba(228, 0, 27, 0.30);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-xl);
         }
 
         input, textarea, select {
             border-radius: 8px !important;
+            border: 1px solid var(--border-color) !important;
+            color: var(--text-primary) !important;
+        }
+
+        input::placeholder {
+            color: var(--text-tertiary) !important;
         }
 
         div[data-baseweb="input"],
@@ -255,27 +264,138 @@ def apply_premium_theme():
             border-radius: 8px;
         }
 
+        div[data-baseweb="input"] input,
+        div[data-baseweb="select"] > div {
+            color: var(--text-primary) !important;
+            border-color: var(--border-color) !important;
+        }
+
+        label {
+            color: var(--text-primary) !important;
+            font-weight: 600 !important;
+        }
+
+        /* Streamlit Slider styling */
+        div[data-testid="stSlider"] label {
+            color: var(--text-primary) !important;
+            font-weight: 700 !important;
+            font-size: 14px !important;
+            margin-bottom: 8px !important;
+        }
+
+        /* Streamlit Selectbox styling */
+        div[data-testid="stSelectbox"] label {
+            color: var(--text-primary) !important;
+            font-weight: 700 !important;
+            font-size: 14px !important;
+            margin-bottom: 8px !important;
+        }
+
+        /* Streamlit Multiselect styling */
+        div[data-testid="stMultiSelect"] label {
+            color: var(--text-primary) !important;
+            font-weight: 700 !important;
+            font-size: 14px !important;
+            margin-bottom: 8px !important;
+        }
+
+        /* Streamlit text input styling */
+        div[data-testid="stTextInput"] label {
+            color: var(--text-primary) !important;
+            font-weight: 700 !important;
+            font-size: 14px !important;
+            margin-bottom: 8px !important;
+        }
+
+        /* Streamlit number input styling */
+        div[data-testid="stNumberInput"] label {
+            color: var(--text-primary) !important;
+            font-weight: 700 !important;
+            font-size: 14px !important;
+            margin-bottom: 8px !important;
+        }
+
+        /* Streamlit text area styling */
+        div[data-testid="stTextArea"] label {
+            color: var(--text-primary) !important;
+            font-weight: 700 !important;
+            font-size: 14px !important;
+            margin-bottom: 8px !important;
+        }
+
+        /* Streamlit color picker styling */
+        div[data-testid="stColorPicker"] label {
+            color: var(--text-primary) !important;
+            font-weight: 700 !important;
+            font-size: 14px !important;
+            margin-bottom: 8px !important;
+        }
+
+        /* Streamlit date input styling */
+        div[data-testid="stDateInput"] label {
+            color: var(--text-primary) !important;
+            font-weight: 700 !important;
+            font-size: 14px !important;
+            margin-bottom: 8px !important;
+        }
+
+        /* Streamlit time input styling */
+        div[data-testid="stTimeInput"] label {
+            color: var(--text-primary) !important;
+            font-weight: 700 !important;
+            font-size: 14px !important;
+            margin-bottom: 8px !important;
+        }
+
+        /* Streamlit checkbox styling */
+        div[data-testid="stCheckbox"] label {
+            color: var(--text-primary) !important;
+            font-weight: 600 !important;
+            font-size: 14px !important;
+        }
+
+        /* Streamlit radio styling */
+        div[data-testid="stRadio"] label {
+            color: var(--text-primary) !important;
+            font-weight: 700 !important;
+            font-size: 14px !important;
+            margin-bottom: 8px !important;
+        }
+
+        /* Streamlit subheader styling */
+        h2 {
+            color: var(--text-primary) !important;
+            font-weight: 800 !important;
+        }
+
+        /* Streamlit caption styling */
+        small, .stCaption {
+            color: var(--text-secondary) !important;
+        }
+
         div[data-testid="stAlert"] {
             border-radius: 8px;
-            border: 1px solid var(--line);
+            border: 1px solid var(--border-color);
+            background: var(--bg-secondary);
         }
 
         .route-chip {
             display: inline-block;
             margin: 4px 8px 4px 0;
-            padding: 8px 10px;
+            padding: 8px 14px;
             border-radius: 999px;
-            background: #111217;
+            background: var(--primary-red);
             color: #ffffff;
             font-size: 13px;
-            font-weight: 800;
+            font-weight: 700;
+            box-shadow: var(--shadow-sm);
         }
 
         .responsive-note {
             display: none;
-            color: var(--muted);
+            color: var(--text-secondary);
             font-size: 12px;
-            line-height: 1.4;
+            line-height: 1.5;
             margin: 2px 0 12px;
         }
 
@@ -283,11 +403,11 @@ def apply_premium_theme():
             position: relative;
             overflow: hidden;
             border-radius: 8px;
-            border: 1px solid rgba(228, 0, 27, 0.22);
-            background: linear-gradient(135deg, #111217, #25272f);
+            border: 1px solid rgba(229, 9, 20, 0.22);
+            background: linear-gradient(135deg, #1F2937, #111827);
             padding: 18px 20px;
             color: #ffffff;
-            box-shadow: 0 14px 34px rgba(20, 22, 28, 0.16);
+            box-shadow: var(--shadow-lg);
             margin: 12px 0;
         }
 
@@ -307,7 +427,7 @@ def apply_premium_theme():
             align-items: center;
             gap: 12px;
             font-size: 15px;
-            font-weight: 800;
+            font-weight: 700;
         }
 
         .signal-loader {
@@ -323,7 +443,7 @@ def apply_premium_theme():
             display: block;
             width: 7px;
             border-radius: 999px;
-            background: #e4001b;
+            background: var(--primary-red);
             animation: signalRise 0.9s ease-in-out infinite;
         }
 
@@ -345,7 +465,7 @@ def apply_premium_theme():
         .loader-copy {
             position: relative;
             z-index: 1;
-            color: rgba(255,255,255,0.74);
+            color: rgba(255,255,255,0.80);
             margin-top: 8px;
             font-size: 13px;
             line-height: 1.5;
@@ -353,10 +473,10 @@ def apply_premium_theme():
 
         .risk-panel {
             border-radius: 8px;
-            border: 1px solid var(--line);
-            background: #ffffff;
-            padding: 18px;
-            box-shadow: 0 12px 30px rgba(20, 22, 28, 0.08);
+            border: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+            padding: 20px;
+            box-shadow: var(--shadow-md);
             margin: 8px 0 16px;
         }
 
@@ -371,7 +491,7 @@ def apply_premium_theme():
         .risk-marker {
             width: 3px;
             height: 10px;
-            background: #111217;
+            background: var(--text-primary);
             margin-left: var(--risk-value);
         }
 
@@ -379,10 +499,10 @@ def apply_premium_theme():
             display: flex;
             align-items: center;
             justify-content: space-between;
-            color: var(--muted);
+            color: var(--text-secondary);
             font-size: 12px;
             font-weight: 700;
-            margin-top: 8px;
+            margin-top: 10px;
         }
 
         @keyframes shimmer {
