@@ -231,6 +231,28 @@ def apply_premium_theme():
             box-shadow: var(--shadow-md);
         }
 
+        /* Metric label and value colors */
+        div[data-testid="stMetric"] > div > div:first-child {
+            color: var(--text-secondary) !important;
+        }
+
+        div[data-testid="stMetric"] > div > div:nth-child(2) {
+            color: var(--text-primary) !important;
+        }
+
+        /* Ensure metric values are dark and visible on white background */
+        div[data-testid="stMetricDelta"] {
+            color: var(--text-primary) !important;
+        }
+
+        .stMetric label,
+        .stMetric h1,
+        .stMetric h2,
+        .stMetric h3,
+        .stMetric span {
+            color: var(--text-primary) !important;
+        }
+
         .stButton > button {
             width: 100%;
             border: 0;
@@ -268,6 +290,35 @@ def apply_premium_theme():
         div[data-baseweb="select"] > div {
             color: var(--text-primary) !important;
             border-color: var(--border-color) !important;
+        }
+
+        /* Selectbox dropdown button and selected value */
+        div[data-testid="stSelectbox"] button {
+            color: var(--text-primary) !important;
+            background: var(--bg-secondary) !important;
+        }
+
+        /* Selectbox dropdown open menu styling */
+        div[data-testid="stSelectbox"] > div[data-baseweb="select"] {
+            background: var(--bg-secondary) !important;
+        }
+
+        div[data-testid="stSelectbox"] div[data-baseweb="select"] button {
+            background: var(--bg-secondary) !important;
+            color: var(--text-primary) !important;
+        }
+
+        /* Selectbox menu items and dropdown list */
+        [role="listbox"],
+        [role="option"] {
+            background: #1F2937 !important;
+            color: #FFFFFF !important;
+        }
+
+        [role="option"]:hover,
+        [role="option"][aria-selected="true"] {
+            background: #111827 !important;
+            color: #FFFFFF !important;
         }
 
         label {
